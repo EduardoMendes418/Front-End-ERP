@@ -1,19 +1,19 @@
-import React from "react";
 import { motion } from "framer-motion";
+import type React from "react";
 import {
-	AreaChart,
 	Area,
-	BarChart,
+	AreaChart,
 	Bar,
-	PieChart,
-	Pie,
+	BarChart,
+	CartesianGrid,
 	Cell,
+	Legend,
+	Pie,
+	PieChart,
+	ResponsiveContainer,
+	Tooltip,
 	XAxis,
 	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
-	Legend,
 } from "recharts";
 
 const revenueData = [
@@ -56,7 +56,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
 		return (
 			<div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
 				<p className="font-semibold text-gray-900 dark:text-white">{label}</p>
-				{payload.map((entry, index) => (
+				{payload.map((entry, _index) => (
 					<p key={entry.dataKey} style={{ color: entry.color }}>
 						{entry.name}:{" "}
 						{entry.value.toLocaleString("pt-BR", {
