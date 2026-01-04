@@ -5,6 +5,7 @@ import {
 	CheckCircle,
 	Globe,
 	Info,
+	LogOut,
 	Moon,
 	Search,
 	Sun,
@@ -13,6 +14,7 @@ import {
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "../../stores/authStore";
 import { useERPStore } from "../../stores/erpStore";
 import type { Notification } from "../../types";
 
@@ -24,6 +26,7 @@ const Header: React.FC = () => {
 		markNotificationAsRead,
 		clearNotifications,
 	} = useERPStore();
+	const { logout } = useAuthStore();
 	const { t, i18n } = useTranslation();
 	const [showNotifications, setShowNotifications] = useState(false);
 
@@ -115,8 +118,8 @@ const Header: React.FC = () => {
 						key={notification.id}
 						className={`w-full p-4 border-b text-left transition-colors duration-200 ${
 							darkMode
-								? "border-gray-700 hover:bg-gray-750"
-								: "border-gray-200 hover:bg-gray-50"
+								? "border-dark-200 hover:bg-dark-100"
+								: "border-primary-100 hover:bg-primary-50"
 						} ${notification.read ? "opacity-60" : ""}`}
 						onClick={() => handleNotificationClick(notification.id)}
 						onKeyDown={(e) =>
@@ -126,12 +129,14 @@ const Header: React.FC = () => {
 						<div className="flex items-start space-x-3">
 							<IconComponent
 								size={20}
-								className={`flex-shrink-0 ${getNotificationColor(notification.type)}`}
+								className={`flex-shrink-0 ${getNotificationColor(
+									notification.type,
+								)}`}
 							/>
 							<div className="flex-1 min-w-0">
 								<p
 									className={`text-sm ${
-										darkMode ? "text-gray-200" : "text-gray-900"
+										darkMode ? "text-primary-50" : "text-dark-300"
 									}`}
 								>
 									{notification.message}
@@ -149,7 +154,7 @@ const Header: React.FC = () => {
 								</p>
 							</div>
 							{!notification.read && (
-								<div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1" />
+								<div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mt-1" />
 							)}
 						</div>
 					</button>
@@ -170,7 +175,9 @@ const Header: React.FC = () => {
 				initial={{ y: -50, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				className={`sticky top-0 z-50 p-6 border-b transition-colors duration-300 ${
-					darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+					darkMode
+						? "bg-dark-200 border-dark-100"
+						: "bg-white border-primary-100"
 				} shadow-sm`}
 			>
 				<div className="flex items-center justify-between">
@@ -187,9 +194,9 @@ const Header: React.FC = () => {
 								placeholder={t("search")}
 								className={`w-full pl-10 pr-4 py-3 rounded-2xl border transition-colors duration-300 ${
 									darkMode
-										? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
-										: "bg-gray-100 border-gray-200 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-								} focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+										? "bg-dark-100 border-dark-200 text-white placeholder-gray-400 focus:border-secondary-500"
+										: "bg-primary-50 border-primary-100 text-dark-300 placeholder-gray-500 focus:border-secondary-500"
+								} focus:outline-none focus:ring-2 focus:ring-secondary-500/20`}
 							/>
 						</form>
 					</div>
@@ -202,7 +209,7 @@ const Header: React.FC = () => {
 							<button
 								type="button"
 								className={`p-2 rounded-xl transition-colors duration-300 ${
-									darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+									darkMode ? "hover:bg-dark-100" : "hover:bg-primary-100"
 								}`}
 								aria-label="Change language"
 								aria-haspopup="true"
@@ -213,8 +220,8 @@ const Header: React.FC = () => {
 							<ul
 								className={`absolute right-0 top-12 w-48 py-2 rounded-xl shadow-2xl border transition-all duration-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible ${
 									darkMode
-										? "bg-gray-800 border-gray-700"
-										: "bg-white border-gray-200"
+										? "bg-dark-200 border-dark-100"
+										: "bg-white border-primary-100"
 								}`}
 							>
 								{languages.map((lang) => (
@@ -228,10 +235,10 @@ const Header: React.FC = () => {
 											}
 											className={`w-full px-4 py-2 text-left transition-colors duration-200 flex items-center space-x-3 ${
 												i18n.language === lang.code
-													? "text-blue-500 font-semibold"
+													? "text-secondary-500 font-semibold"
 													: darkMode
-														? "text-gray-300 hover:text-white"
-														: "text-gray-600 hover:text-gray-900"
+														? "text-primary-50 hover:text-white"
+														: "text-dark-300 hover:text-dark-200"
 											}`}
 										>
 											<span className="text-lg" aria-hidden="true">
@@ -250,7 +257,7 @@ const Header: React.FC = () => {
 								onClick={handleToggleNotifications}
 								onKeyDown={(e) => handleKeyDown(e, handleToggleNotifications)}
 								className={`relative p-2 rounded-xl transition-colors duration-300 ${
-									darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+									darkMode ? "hover:bg-dark-100" : "hover:bg-primary-100"
 								}`}
 								aria-label={`Notifications ${unreadCount > 0 ? `${unreadCount} unread` : ""}`}
 								aria-expanded={showNotifications}
@@ -273,15 +280,15 @@ const Header: React.FC = () => {
 										exit={{ opacity: 0, y: 10, scale: 0.95 }}
 										className={`absolute right-0 top-12 w-96 rounded-xl shadow-2xl border transition-colors duration-300 ${
 											darkMode
-												? "bg-gray-800 border-gray-700"
-												: "bg-white border-gray-200"
+												? "bg-dark-200 border-dark-100"
+												: "bg-white border-primary-100"
 										}`}
 										role="dialog"
 										aria-label="Notifications"
 									>
 										<header
 											className={`p-4 border-b ${
-												darkMode ? "border-gray-700" : "border-gray-200"
+												darkMode ? "border-dark-100" : "border-primary-100"
 											}`}
 										>
 											<div className="flex items-center justify-between">
@@ -334,12 +341,12 @@ const Header: React.FC = () => {
 										{notifications.length > 0 && (
 											<footer
 												className={`p-3 border-t ${
-													darkMode ? "border-gray-700" : "border-gray-200"
+													darkMode ? "border-dark-100" : "border-primary-100"
 												}`}
 											>
 												<button
 													type="button"
-													className="w-full text-center text-sm text-blue-500 hover:text-blue-600 font-medium"
+													className="w-full text-center text-sm text-secondary-500 hover:text-secondary-600 font-medium"
 													onKeyDown={(e) => handleKeyDown(e, () => {})}
 												>
 													{t("viewAll")}
@@ -358,14 +365,28 @@ const Header: React.FC = () => {
 							onKeyDown={(e) => handleKeyDown(e, toggleTheme)}
 							className={`p-3 rounded-2xl transition-colors duration-300 ${
 								darkMode
-									? "bg-blue-500 text-white"
-									: "bg-gray-200 text-gray-700"
+									? "bg-secondary-500 text-white"
+									: "bg-primary-200 text-primary-700"
 							}`}
 							aria-label={
 								darkMode ? "Switch to light mode" : "Switch to dark mode"
 							}
 						>
 							{darkMode ? <Sun size={20} /> : <Moon size={20} />}
+						</motion.button>
+						<motion.button
+							type="button"
+							whileTap={{ scale: 0.95 }}
+							onClick={logout}
+							onKeyDown={(e) => handleKeyDown(e, logout)}
+							className={`p-3 rounded-2xl transition-colors duration-300 ${
+								darkMode
+									? "bg-red-500 text-white"
+									: "bg-primary-200 text-primary-700"
+							}`}
+							aria-label="Logout"
+						>
+							<LogOut size={20} />
 						</motion.button>
 					</nav>
 				</div>
